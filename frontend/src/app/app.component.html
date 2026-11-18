@@ -1,0 +1,38 @@
+@if (auth.sesion()) {
+  <div class="shell">
+    <aside class="sidebar">
+      <a routerLink="/dashboard" class="brand" ><img class="brand-mark" src="logo.svg" alt="Logo de Fórmulas Magistrales" width="44" height="44" /><span>Fórmulas<br /><strong>Magistrales</strong></span></a >
+      <p class="nav-label">ESPACIO DE TRABAJO</p>
+      <nav aria-label="Navegación principal">
+        <a routerLink="/dashboard" routerLinkActive="active" ><span>▦</span> Dashboard</a >
+        @if (auth.puedeVerPacientes()) {
+          <a routerLink="/pacientes" routerLinkActive="active" ><span>♧</span> Pacientes</a >
+        }
+        <a routerLink="/formulas" routerLinkActive="active" ><span>◈</span> Fórmulas</a >
+        <a routerLink="/insumos" routerLinkActive="active"><span>I</span> Insumos</a>
+        <a routerLink="/movimientos-stock" routerLinkActive="active"><span>M</span> Movimientos de stock</a>
+        @if (auth.puedeVerPacientes()) {
+          <a routerLink="/citas" routerLinkActive="active">Citas</a>
+          <a routerLink="/recetas" routerLinkActive="active">Recetas</a>
+        }
+      </nav>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <span>Gestión de fórmulas y pacientes</span>
+        <div class="session">
+          <span class="avatar">{{ auth.sesion()?.username?.charAt(0)?.toUpperCase() }}</span ><span >{{ auth.sesion()?.username }}
+            <small>{{ auth.sesion()?.rol }}</small></span ><button class="btn-quiet" (click)="auth.salir()">
+            Cerrar sesión
+          </button>
+        </div>
+      </header>
+      <main><router-outlet /></main>
+    </div>
+  </div>
+} @else {
+  <router-outlet />
+}
+
+
+

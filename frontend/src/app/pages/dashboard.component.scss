@@ -1,0 +1,326 @@
+.dashboard {
+  display: grid;
+  gap: 24px;
+}
+
+.dashboard-heading,
+.panel-heading,
+.metric-topline,
+.dashboard-action {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-heading,
+.panel-heading {
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.dashboard-heading {
+  margin-bottom: 4px;
+
+  h1 {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(28px, 4vw, 36px);
+    letter-spacing: -1.2px;
+  }
+
+  .muted {
+    margin: 8px 0 0;
+  }
+}
+
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dashboard-metric,
+.dashboard-panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgb(24 61 54 / 4%);
+}
+
+.dashboard-metric {
+  min-width: 0;
+  padding: 22px;
+}
+
+.metric-topline {
+  gap: 11px;
+}
+
+.metric-symbol,
+.formula-mark,
+.action-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: #e8f1e6;
+  color: #356d55;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.formulas-metric .metric-symbol {
+  background: #e8eff8;
+  color: #365e89;
+}
+
+.average-metric .metric-symbol {
+  background: #f5efe3;
+  color: #8a6834;
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.metric-value {
+  display: block;
+  margin-top: 15px;
+  color: var(--ink);
+  font-size: 42px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  letter-spacing: -1.5px;
+}
+
+.metric-caption {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(290px, 0.8fr);
+  align-items: start;
+  gap: 18px;
+}
+
+.dashboard-panel {
+  min-width: 0;
+  padding: 22px;
+}
+
+.panel-heading {
+  margin-bottom: 16px;
+
+  .eyebrow {
+    margin-bottom: 7px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+  }
+}
+
+.text-link {
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgb(21 121 105 / 28%);
+    outline-offset: 4px;
+    border-radius: 3px;
+  }
+}
+
+.recent-list,
+.dashboard-actions {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 0;
+  border-top: 1px solid #edf1ee;
+
+  &:first-child {
+    border-top: 0;
+  }
+}
+
+.formula-mark {
+  width: 34px;
+  height: 34px;
+  background: #e8eff8;
+  color: #365e89;
+  font-size: 13px;
+}
+
+.formula-info {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+
+  strong,
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: var(--ink);
+    font-size: 13px;
+  }
+
+  span {
+    color: var(--muted);
+    font-size: 11px;
+  }
+}
+
+.ingredient-count {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.dashboard-action {
+  gap: 12px;
+  padding: 15px 0;
+  border-top: 1px solid #edf1ee;
+  color: inherit;
+  text-decoration: none;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  &:hover .action-arrow {
+    transform: translateX(3px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgb(21 121 105 / 28%);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+.action-icon {
+  width: 34px;
+  height: 34px;
+  background: #e8f1e6;
+  font-size: 13px;
+}
+
+.dashboard-action > span:nth-child(2) {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+
+  strong {
+    color: var(--ink);
+    font-size: 13px;
+  }
+
+  small {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+}
+
+.action-arrow {
+  color: var(--teal);
+  transition: transform 160ms ease;
+}
+
+.empty-state {
+  padding: 22px 4px;
+  color: var(--muted);
+  font-size: 13px;
+
+  strong {
+    color: var(--ink);
+  }
+
+  p {
+    margin: 7px 0 13px;
+  }
+}
+
+.dashboard-error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .dashboard {
+    gap: 17px;
+  }
+
+  .dashboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-metrics {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .dashboard-metric {
+    padding: 17px;
+  }
+
+  .metric-value {
+    margin-top: 10px;
+    font-size: 34px;
+  }
+
+  .dashboard-panel {
+    padding: 17px;
+  }
+
+  .dashboard-error {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ingredient-count {
+    display: none;
+  }
+}

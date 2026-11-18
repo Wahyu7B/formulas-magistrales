@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="titulo">
+  <title id="titulo">Fórmulas Magistrales: frasco y hoja</title>
+  <rect width="64" height="64" rx="18" fill="#d7ebe1"/>
+  <rect x="25" y="10" width="14" height="6" rx="2" fill="#185f50"/>
+  <path d="M26 16v10l-9 17a6 6 0 0 0 5 9h20a6 6 0 0 0 5-9l-9-17V16" fill="none" stroke="#185f50" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M21 39h22l4 8H17z" fill="#a1c6ab"/>
+  <path d="M32 40c-7-7-1-14 8-14 1 8-2 13-8 14z" fill="#157969"/>
+  <path d="M27 45l10-14" stroke="#eff8ee" stroke-width="2" stroke-linecap="round"/>
+</svg>

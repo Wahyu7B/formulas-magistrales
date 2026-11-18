@@ -1,0 +1,48 @@
+<div class="section-heading">
+  <h3>Ingredientes</h3>
+  <button
+    type="button"
+    class="btn secondary small"
+    (click)="agregar.emit()"
+    [disabled]="ingredientes().length >= 30"
+  >
+    + Añadir ingrediente
+  </button>
+</div>
+<div>
+  @for (grupo of ingredientes().controls; track grupo; let i = $index) {
+    <div class="ingredient-row" [formGroup]="grupo">
+      <div>
+        <label [for]="'ing-nombre-' + i">Ingrediente {{ i + 1 }}</label>
+        <input [id]="'ing-nombre-' + i" formControlName="nombre" />
+        @if (grupo.controls.nombre.touched && grupo.controls.nombre.invalid) {
+          <small class="field-error">Nombre obligatorio, máximo 100 caracteres.</small>
+        }
+      </div>
+      <div>
+        <label [for]="'ing-cantidad-' + i">Cantidad</label>
+        <input [id]="'ing-cantidad-' + i" type="number" step="0.0001" formControlName="cantidad" />
+        @if (grupo.controls.cantidad.touched && grupo.controls.cantidad.invalid) {
+          <small class="field-error">Cantidad positiva con hasta 4 decimales.</small>
+        }
+      </div>
+      <div>
+        <label [for]="'ing-unidad-' + i">Unidad</label>
+        <select [id]="'ing-unidad-' + i" formControlName="unidad">
+          <option value="g">g</option>
+          <option value="ml">ml</option>
+          <option value="unidad">unidad</option>
+        </select>
+      </div>
+      <button
+        type="button"
+        class="btn-link danger"
+        [disabled]="ingredientes().length <= 1"
+        (click)="quitar.emit(i)"
+        [attr.aria-label]="'Quitar ingrediente ' + (i + 1)"
+      >
+        Quitar
+      </button>
+    </div>
+  }
+</div>

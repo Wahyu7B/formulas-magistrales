@@ -1,0 +1,52 @@
+<div class="login-page">
+  <section class="login-story">
+    <div class="brand">
+      <img class="brand-mark" src="logo.svg" alt="Logo de Fórmulas Magistrales" width="44" height="44" /><span>Fórmulas<br /><strong>Magistrales</strong></span>
+    </div>
+    <div>
+      <span class="eyebrow">ORDEN EN CADA FÓRMULA</span>
+      <h1>Un espacio claro<br />para tu gestión.</h1>
+      <p>
+        Pacientes, composiciones y consultas.<br />La información que necesitas,
+        en un solo lugar.
+      </p>
+      <div class="story-art" aria-hidden="true">
+        <div class="bottle"><span>fm</span></div>
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <span class="art-label">Cuidado en cada detalle.</span>
+      </div>
+    </div>
+  </section>
+  <section class="login-form-wrap">
+    <div class="login-card">
+      <span class="eyebrow">BIENVENIDO A TU ESPACIO</span>
+      <h2>{{ registro() ? "Crear cuenta de consulta" : "Iniciar sesión" }}</h2>
+      <p class="muted">
+        {{ registro() ? "Completa tus datos para consultar las fórmulas." : "Ingresa tus credenciales para continuar." }}
+      </p>
+      @if (error()) {
+        <p class="notice error" role="alert">{{ error() }}</p>
+      }
+      @if (aviso()) {
+        <p class="notice success" role="status">{{ aviso() }}</p>
+      }
+      <form [formGroup]="form" (ngSubmit)="enviar()">
+        <label for="username">Usuario</label ><input id="username" formControlName="username" autocomplete="username" placeholder="Tu nombre de usuario" />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+          <small class="field-error" >Usa entre 4 y 40 letras, números o guiones bajos.</small >
+        }
+        <label for="password">Contraseña</label ><input id="password" type="password" formControlName="password" autocomplete="current-password" placeholder="Tu contraseña" />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <small class="field-error" >La contraseña debe tener entre 8 y 72 caracteres.</small >
+        }
+        <button class="btn primary full" [disabled]="ocupado()">
+          {{ ocupado() ? "Procesando…" : registro() ? "Crear cuenta" : "Ingresar" }}
+        </button>
+      </form>
+      <button class="btn-quiet full" (click)="cambiarModo()">
+        {{ registro() ? "Volver al inicio de sesión" : "Crear una cuenta de consulta" }}
+      </button>
+    </div>
+  </section>
+</div>

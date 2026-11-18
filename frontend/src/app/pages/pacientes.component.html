@@ -1,0 +1,127 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">REGISTRO DE PERSONAS</span>
+    <h1>Pacientes</h1>
+    <p class="muted">
+      Administra los datos de los destinatarios de cada fórmula.
+    </p>
+  </div>
+  @if (auth.puedeGestionarPacientes()) {
+    <button class="btn primary" (click)="abrir()">+ Nuevo paciente</button>
+  }
+</div>
+@if (error()) {
+  <p class="notice error" role="alert">{{ error() }}</p>
+}
+@if (aviso()) {
+  <p class="notice success" role="status">{{ aviso() }}</p>
+}
+@if (mostrando()) {
+  <section class="panel form-panel">
+    <h2>{{ editando() ? "Editar paciente" : "Nuevo paciente" }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <div>
+          <label for="dni">DNI</label ><input id="dni" formControlName="dni" maxlength="8" inputmode="numeric" />
+          @if (form.controls.dni.touched && form.controls.dni.invalid) {
+            <small class="field-error">Ingresa exactamente 8 dígitos.</small>
+          }
+        </div>
+        <div>
+          <label for="telefono">Teléfono</label ><input id="telefono" formControlName="telefono" maxlength="9" inputmode="numeric" />
+          @if ( form.controls.telefono.touched && form.controls.telefono.invalid ) {
+            <small class="field-error">Ingresa exactamente 9 dígitos.</small>
+          }
+        </div>
+        <div>
+          <label for="nombres">Nombres</label ><input id="nombres" formControlName="nombres" />
+          @if (form.controls.nombres.touched && form.controls.nombres.invalid) {
+            <small class="field-error" >Nombres obligatorios, máximo 100 caracteres.</small >
+          }
+        </div>
+        <div>
+          <label for="apellidos">Apellidos</label ><input id="apellidos" formControlName="apellidos" />
+          @if ( form.controls.apellidos.touched && form.controls.apellidos.invalid ) {
+            <small class="field-error" >Apellidos obligatorios, máximo 100 caracteres.</small >
+          }
+        </div>
+        <div class="span-two">
+          <label for="direccion">Dirección</label ><input id="direccion" formControlName="direccion" />
+          @if ( form.controls.direccion.touched && form.controls.direccion.invalid ) {
+            <small class="field-error" >Dirección obligatoria, máximo 250 caracteres.</small >
+          }
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn secondary" (click)="mostrando.set(false)" >
+          Cancelar</button ><button class="btn primary" [disabled]="ocupado()">
+          {{ ocupado() ? "Guardando…" : "Guardar paciente" }}
+        </button>
+      </div>
+    </form>
+  </section>
+}
+<section class="panel">
+  <div class="table-toolbar">
+    <h2>
+      Pacientes activos <span class="count">{{ filtrados().length }}</span>
+    </h2>
+    <input class="search" aria-label="Buscar paciente" placeholder="Buscar por nombre o DNI…" (input)="busqueda.set($any($event.target).value)" />
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>DNI</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of filtrados(); track p.id) {
+          <tr>
+            <td>
+              <strong>{{ p.nombres }} {{ p.apellidos }}</strong ><small>Paciente #{{ p.id }}</small>
+            </td>
+            <td>{{ p.dni }}</td>
+            <td>{{ p.telefono }}</td>
+            <td>{{ p.direccion }}</td>
+            <td class="actions">
+              @if (auth.puedeGestionarPacientes()) {
+                <button class="btn-link" (click)="abrir(p)">Editar</button ><button class="btn-link danger" (click)="baja.set(p)">
+                  Dar de baja
+                </button>
+              } @else {
+                <span class="tag">Solo consulta</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="empty">
+              No hay pacientes que coincidan con la búsqueda.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+@if (baja(); as p) {
+  <div class="modal-backdrop">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="baja-paciente" >
+      <h2 id="baja-paciente">Dar de baja al paciente</h2>
+      <p>
+        {{ p.nombres }} {{ p.apellidos }} dejará de aparecer en el listado
+        activo. Sus registros históricos se conservarán.
+      </p>
+      <div class="form-actions">
+        <button class="btn secondary" (click)="baja.set(null)">Cancelar</button ><button class="btn danger-btn" [disabled]="ocupado()" (click)="eliminar()" >
+          Confirmar baja
+        </button>
+      </div>
+    </section>
+  </div>
+}

@@ -1,0 +1,132 @@
+<div class="dashboard">
+  <header class="dashboard-heading">
+    <div>
+      <span class="eyebrow">PANEL DE CONTROL</span>
+      <h1>Resumen general</h1>
+      <p class="muted">
+        Hola, {{ auth.sesion()?.username }}. Consulta el estado de pacientes y fórmulas.
+      </p>
+    </div>
+    <button
+      class="btn secondary refresh-button"
+      type="button"
+      (click)="cargar()"
+      [disabled]="cargando()"
+    >
+      {{ cargando() ? "Actualizando…" : "Actualizar" }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="notice error dashboard-error" role="alert">
+      <span>{{ error() }}</span>
+      <button class="btn secondary small" type="button" (click)="cargar()">Reintentar</button>
+    </div>
+  }
+
+  <section class="dashboard-metrics" aria-label="Indicadores del sistema">
+    <article class="dashboard-metric patients-metric">
+      <div class="metric-topline">
+        <span class="metric-symbol" aria-hidden="true">P</span>
+        <span class="metric-label">Pacientes activos</span>
+      </div>
+      <strong class="metric-value">{{ datos()?.totalPacientes ?? "—" }}</strong>
+      <span class="metric-caption">Personas registradas y activas</span>
+    </article>
+
+    <article class="dashboard-metric formulas-metric">
+      <div class="metric-topline">
+        <span class="metric-symbol" aria-hidden="true">F</span>
+        <span class="metric-label">Fórmulas activas</span>
+      </div>
+      <strong class="metric-value">{{ datos()?.totalFormulas ?? "—" }}</strong>
+      <span class="metric-caption">Composiciones disponibles en el sistema</span>
+    </article>
+
+    <article class="dashboard-metric average-metric">
+      <div class="metric-topline">
+        <span class="metric-symbol" aria-hidden="true">↗</span>
+        <span class="metric-label">Promedio por paciente</span>
+      </div>
+      <strong class="metric-value">{{ datos() ? (formulasPorPaciente | number : "1.0-1") : "—" }}</strong>
+      <span class="metric-caption">Fórmulas activas por paciente activo</span>
+    </article>
+    <article class="dashboard-metric stock-metric">
+      <div class="metric-topline">
+        <span class="metric-symbol" aria-hidden="true">!</span>
+        <span class="metric-label">Insumos por reponer</span>
+      </div>
+      <strong class="metric-value">{{ datos()?.insumosBajoStock ?? "—" }}</strong>
+      <a routerLink="/insumos" class="metric-caption">Revisar niveles de stock →</a>
+    </article>
+  </section>
+
+  <div class="dashboard-content">
+    <section class="dashboard-panel recent-panel" aria-labelledby="recent-title">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">ACTIVIDAD</span>
+          <h2 id="recent-title">Fórmulas recientes</h2>
+        </div>
+        <a routerLink="/formulas" class="text-link">Ver todas <span aria-hidden="true">→</span></a>
+      </div>
+
+      @if (cargando() && !datos()) {
+        <p class="empty-state" role="status">Cargando el resumen…</p>
+      } @else if (formulasRecientes().length) {
+        <ul class="recent-list">
+          @for (formula of formulasRecientes(); track formula.id) {
+            <li class="recent-item">
+              <span class="formula-mark" aria-hidden="true">F</span>
+              <div class="formula-info">
+                <strong>{{ formula.nombre }}</strong>
+                <span>{{ formula.pacienteNombre }} · {{ formula.presentacion }}</span>
+              </div>
+              <span class="ingredient-count">
+                {{ formula.ingredientes.length }}
+                {{ formula.ingredientes.length === 1 ? "ingrediente" : "ingredientes" }}
+              </span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty-state">
+          <strong>Aún no hay fórmulas registradas</strong>
+          <p>Las fórmulas activas aparecerán aquí cuando se registren.</p>
+          <a routerLink="/formulas" class="text-link">Ir a fórmulas →</a>
+        </div>
+      }
+    </section>
+
+    <section class="dashboard-panel actions-panel" aria-labelledby="actions-title">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">ACCESO DIRECTO</span>
+          <h2 id="actions-title">Continuar trabajando</h2>
+        </div>
+      </div>
+
+      <div class="dashboard-actions">
+        @if (auth.puedeVerPacientes()) {
+          <a routerLink="/pacientes" class="dashboard-action">
+            <span class="action-icon" aria-hidden="true">P</span>
+            <span>
+              <strong>{{ auth.puedeGestionarPacientes() ? "Gestionar pacientes" : "Consultar pacientes" }}</strong>
+              <small>{{ auth.puedeGestionarPacientes() ? "Registrar y actualizar datos" : "Consultar los pacientes registrados" }}</small>
+            </span>
+            <span class="action-arrow" aria-hidden="true">→</span>
+          </a>
+        }
+
+        <a routerLink="/formulas" class="dashboard-action">
+          <span class="action-icon" aria-hidden="true">F</span>
+          <span>
+            <strong>{{ auth.puedeGestionarFormulas() ? "Gestionar fórmulas" : "Consultar fórmulas" }}</strong>
+            <small>{{ auth.puedeGestionarFormulas() ? "Crear y mantener composiciones" : "Revisar composiciones e ingredientes" }}</small>
+          </span>
+          <span class="action-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>

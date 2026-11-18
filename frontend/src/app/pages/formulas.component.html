@@ -1,0 +1,170 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">COMPOSICIONES REGISTRADAS</span>
+    <h1>Fórmulas magistrales</h1>
+    <p class="muted">
+      Consulta las fórmulas y los ingredientes asociados a cada paciente.
+    </p>
+  </div>
+  @if (auth.puedeGestionarFormulas()) {
+    <button class="btn primary" (click)="abrir()">+ Nueva fórmula</button>
+  }
+</div>
+@if (error()) {
+  <p class="notice error" role="alert">{{ error() }}</p>
+}
+@if (aviso()) {
+  <p class="notice success" role="status">{{ aviso() }}</p>
+}
+@if (mostrando()) {
+  <section class="panel form-panel">
+    <h2>{{ editando() ? "Editar fórmula" : "Nueva fórmula" }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <div>
+          <label for="formula-nombre">Nombre de la fórmula</label ><input id="formula-nombre" formControlName="nombre" />
+          @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+            <small class="field-error" >Nombre obligatorio, máximo 120 caracteres.</small >
+          }
+        </div>
+        <div>
+          <label for="presentacion">Presentación</label ><input id="presentacion" formControlName="presentacion" placeholder="Ej. Envase de 100 g" />
+          @if ( form.controls.presentacion.touched && form.controls.presentacion.invalid ) {
+            <small class="field-error" >Presentación obligatoria, máximo 100 caracteres.</small >
+          }
+        </div>
+        <div class="span-two">
+          <label for="paciente">Paciente</label ><select id="paciente" formControlName="pacienteId">
+            <option [ngValue]="0">Selecciona un paciente</option>
+            @for (p of pacientes(); track p.id) {
+              <option [ngValue]="p.id">
+                {{ p.nombres }} {{ p.apellidos }} · {{ p.dni }}
+              </option>
+            }
+          </select>
+          @if ( form.controls.pacienteId.touched && form.controls.pacienteId.invalid ) {
+            <small class="field-error">Selecciona un paciente activo.</small>
+          }
+        </div>
+        <div class="span-two">
+          <label for="indicaciones">Indicaciones</label ><textarea id="indicaciones" formControlName="indicaciones" rows="3" ></textarea>
+          @if ( form.controls.indicaciones.touched && form.controls.indicaciones.invalid ) {
+            <small class="field-error" >Indicaciones obligatorias, máximo 2000 caracteres.</small >
+          }
+        </div>
+      </div>
+      <app-ingredientes-editor [ingredientes]="ingredientes" (agregar)="agregarIngrediente()" (quitar)="quitarIngrediente($event)" />
+      <div class="form-actions">
+        <button type="button" class="btn secondary" (click)="mostrando.set(false)" >
+          Cancelar</button ><button class="btn primary" [disabled]="ocupado()">
+          {{ ocupado() ? "Guardando…" : "Guardar fórmula" }}
+        </button>
+      </div>
+    </form>
+  </section>
+}
+<section class="panel">
+  <div class="table-toolbar">
+    <h2>
+      Fórmulas activas <span class="count">{{ lista().length }}</span>
+    </h2>
+    <span class="tag">{{ auth.puedeGestionarFormulas() ? "Administración" : "Solo consulta" }}</span>
+  </div>
+  <form class="filters" [formGroup]="filtros" (ngSubmit)="cargar()">
+    <input aria-label="Buscar fórmula por nombre" formControlName="nombre" placeholder="Buscar por nombre…" />
+    @if (auth.puedeVerPacientes()) {
+      <select aria-label="Filtrar por paciente" formControlName="pacienteId">
+        <option value="">Todos los pacientes</option>
+        @for (p of pacientes(); track p.id) {
+          <option [value]="p.id">{{ p.nombres }} {{ p.apellidos }}</option>
+        }
+      </select>
+    }
+    <button class="btn secondary">Buscar</button ><button type="button" class="btn-quiet" (click)="limpiar()">
+      Limpiar
+    </button>
+  </form>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Fórmula</th>
+          <th>Paciente</th>
+          <th>Presentación</th>
+          <th>Ingredientes</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of lista(); track f.id) {
+          <tr>
+            <td>
+              <strong>{{ f.nombre }}</strong ><small>Fórmula #{{ f.id }}</small>
+            </td>
+            <td>{{ f.pacienteNombre }}</td>
+            <td>{{ f.presentacion }}</td>
+            <td>
+              <span class="tag">{{ f.ingredientes.length }} ingredientes</span>
+            </td>
+            <td class="actions">
+              <button class="btn-link" (click)="detalle.set(f)">
+                Ver detalle
+              </button>
+              @if (auth.puedeGestionarFormulas()) {
+                <button class="btn-link" (click)="abrir(f)">Editar</button ><button class="btn-link danger" (click)="baja.set(f)">
+                  Dar de baja
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="empty">
+              No hay fórmulas que coincidan con los filtros.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+@if (detalle(); as f) {
+  <div class="modal-backdrop">
+    <section class="modal detail-modal" role="dialog" aria-modal="true" aria-labelledby="detalle-formula" >
+      <span class="eyebrow">FÓRMULA #{{ f.id }}</span>
+      <h2 id="detalle-formula">{{ f.nombre }}</h2>
+      <p class="muted">{{ f.pacienteNombre }} · {{ f.presentacion }}</p>
+      <h3>Composición</h3>
+      <ul class="ingredient-list">
+        @for (item of f.ingredientes; track item.id) {
+          <li>
+            <span>{{ item.nombre }}</span ><strong>{{ item.cantidad }} {{ item.unidad }}</strong>
+          </li>
+        }
+      </ul>
+      <h3>Indicaciones</h3>
+      <p class="preserve-text">{{ f.indicaciones }}</p>
+      <div class="form-actions">
+        <button class="btn secondary" (click)="detalle.set(null)">
+          Cerrar detalle
+        </button>
+      </div>
+    </section>
+  </div>
+}
+@if (baja(); as f) {
+  <div class="modal-backdrop">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="baja-formula" >
+      <h2 id="baja-formula">Dar de baja la fórmula</h2>
+      <p>
+        {{ f.nombre }} dejará de aparecer en el listado activo. Su composición
+        se conservará.
+      </p>
+      <div class="form-actions">
+        <button class="btn secondary" (click)="baja.set(null)">Cancelar</button ><button class="btn danger-btn" [disabled]="ocupado()" (click)="eliminar()" >
+          Confirmar baja
+        </button>
+      </div>
+    </section>
+  </div>
+}

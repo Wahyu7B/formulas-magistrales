@@ -1,0 +1,94 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">INVENTARIO DEL LABORATORIO</span>
+    <h1>Insumos</h1>
+    <p class="muted">Controla materias primas, unidades y niveles mínimos de stock.</p>
+  </div>
+  @if (auth.puedeGestionarInsumos()) {
+    <button class="btn primary" type="button" (click)="abrir()">+ Registrar insumo</button>
+  }
+</div>
+@if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+@if (aviso()) { <p class="notice success" role="status">{{ aviso() }}</p> }
+
+@if (mostrando()) {
+  <section class="panel" aria-labelledby="form-title">
+    <h2 id="form-title">{{ editando() ? "Editar insumo" : "Registrar insumo" }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <div>
+          <label for="insumo-nombre">Nombre de la materia prima</label>
+          <input id="insumo-nombre" formControlName="nombre" maxlength="100" />
+          @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+            <small class="field-error">Ingresa un nombre válido de hasta 100 caracteres.</small>
+          }
+        </div>
+        <div>
+          <label for="insumo-unidad">Unidad</label>
+          <select id="insumo-unidad" formControlName="unidad">
+            <option value="g">Gramos (g)</option>
+            <option value="ml">Mililitros (ml)</option>
+            <option value="unidad">Unidad</option>
+          </select>
+        </div>
+        <div>
+          <label for="insumo-stock">Stock disponible</label>
+          <input id="insumo-stock" type="number" min="0" step="0.0001" formControlName="stock" />
+          @if (form.controls.stock.touched && form.controls.stock.invalid) {
+            <small class="field-error">El stock no puede ser negativo.</small>
+          }
+        </div>
+        <div>
+          <label for="insumo-minimo">Nivel mínimo de stock</label>
+          <input id="insumo-minimo" type="number" min="0" step="0.0001" formControlName="stockMinimo" />
+          @if (form.controls.stockMinimo.touched && form.controls.stockMinimo.invalid) {
+            <small class="field-error">El mínimo no puede ser negativo.</small>
+          }
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn secondary" type="button" (click)="mostrando.set(false)">Cancelar</button>
+        <button class="btn primary" type="submit" [disabled]="cargando()">Guardar insumo</button>
+      </div>
+    </form>
+  </section>
+}
+
+<section class="panel">
+  <div class="section-heading">
+    <h2>Materias primas registradas</h2>
+    <button class="btn secondary small" type="button" (click)="cargar()" [disabled]="cargando()">
+      {{ cargando() ? "Actualizando…" : "Actualizar" }}
+    </button>
+  </div>
+  @if (cargando() && !lista().length) {
+    <p role="status">Cargando inventario…</p>
+  } @else if (lista().length) {
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Insumo</th><th>Disponible</th><th>Mínimo</th><th>Estado</th>@if(auth.puedeGestionarInsumos()){<th>Acciones</th>}</tr></thead>
+        <tbody>
+          @for (insumo of lista(); track insumo.id) {
+            <tr>
+              <td><strong>{{ insumo.nombre }}</strong></td>
+              <td>{{ insumo.stock }} {{ insumo.unidad }}</td>
+              <td>{{ insumo.stockMinimo }} {{ insumo.unidad }}</td>
+              <td><span class="tag" [class.stock-low]="insumo.bajoStock">{{ insumo.bajoStock ? "Reponer" : "Disponible" }}</span></td>
+              @if (auth.puedeGestionarInsumos()) {
+                <td class="actions">
+                  <button class="btn-link" type="button" (click)="abrir(insumo)">Editar</button>
+                  <button class="btn-link danger" type="button" (click)="eliminar(insumo)">Dar de baja</button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <strong>No hay insumos registrados</strong>
+      <p>Registra materias primas para controlar la disponibilidad del laboratorio.</p>
+    </div>
+  }
+</section>

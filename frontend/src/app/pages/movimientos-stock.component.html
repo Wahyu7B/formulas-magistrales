@@ -1,0 +1,84 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">INVENTARIO DEL LABORATORIO</span>
+    <h1>Movimientos de stock</h1>
+    <p class="muted">Registra entradas y egresos para mantener la trazabilidad de los insumos.</p>
+  </div>
+  <a routerLink="/insumos" class="btn secondary">Ver inventario</a>
+</div>
+@if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+@if (aviso()) { <p class="notice success" role="status">{{ aviso() }}</p> }
+
+@if (auth.puedeGestionarInsumos()) {
+  <section class="panel" aria-labelledby="movement-title">
+    <h2 id="movement-title">Registrar movimiento</h2>
+    <form [formGroup]="form" (ngSubmit)="registrar()">
+      <div class="form-grid">
+        <div>
+          <label for="movement-item">Insumo</label>
+          <select id="movement-item" formControlName="insumoId">
+            <option [ngValue]="0" disabled>Selecciona un insumo</option>
+            @for (insumo of insumos(); track insumo.id) {
+              <option [ngValue]="insumo.id">{{ insumo.nombre }} · stock {{ insumo.stock }} {{ insumo.unidad }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label for="movement-type">Tipo de movimiento</label>
+          <select id="movement-type" formControlName="tipo">
+            <option value="INGRESO">Ingreso</option>
+            <option value="EGRESO">Egreso</option>
+          </select>
+        </div>
+        <div>
+          <label for="movement-amount">Cantidad</label>
+          <input id="movement-amount" type="number" min="0.0001" step="0.0001" formControlName="cantidad" />
+          @if (form.controls.cantidad.touched && form.controls.cantidad.invalid) {
+            <small class="field-error">Ingresa una cantidad mayor que cero.</small>
+          }
+        </div>
+        <div>
+          <label for="movement-reason">Motivo</label>
+          <input id="movement-reason" maxlength="250" formControlName="motivo" placeholder="Ej. Compra o ajuste de inventario" />
+          @if (form.controls.motivo.touched && form.controls.motivo.invalid) {
+            <small class="field-error">El motivo es obligatorio, máximo 250 caracteres.</small>
+          }
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn primary" type="submit" [disabled]="cargando()">Registrar movimiento</button>
+      </div>
+    </form>
+  </section>
+}
+
+<section class="panel">
+  <div class="section-heading">
+    <h2>Historial reciente</h2>
+    <button class="btn secondary small" type="button" (click)="cargar()" [disabled]="cargando()">Actualizar</button>
+  </div>
+  @if (movimientos().length) {
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fecha</th><th>Insumo</th><th>Movimiento</th><th>Cantidad</th><th>Stock resultante</th><th>Motivo</th></tr></thead>
+        <tbody>
+          @for (movimiento of movimientos(); track movimiento.id) {
+            <tr>
+              <td>{{ movimiento.creadoEn | date : "dd/MM/yyyy HH:mm" }}</td>
+              <td><strong>{{ movimiento.insumo }}</strong></td>
+              <td><span class="tag" [class.stock-low]="movimiento.tipo === 'EGRESO'">{{ movimiento.tipo === "INGRESO" ? "Ingreso" : "Egreso" }}</span></td>
+              <td>{{ movimiento.cantidad }} {{ movimiento.unidad }}</td>
+              <td>{{ movimiento.stockResultante }} {{ movimiento.unidad }}</td>
+              <td>{{ movimiento.motivo }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <strong>Aún no hay movimientos</strong>
+      <p>Los ingresos y egresos registrados aparecerán en este historial.</p>
+    </div>
+  }
+</section>
